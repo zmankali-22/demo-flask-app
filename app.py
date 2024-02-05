@@ -4,6 +4,8 @@ from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
 
 from flask_marshmallow import Marshmallow
+from flask_bcrypt import Bcrypt
+from flask_jwt_extended import JWTManager
 
 app = Flask(__name__)
 
@@ -11,9 +13,13 @@ app = Flask(__name__)
 
 app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql+psycopg2://ecommerce_dev:123456@localhost:5432/oct_ecommerce"
 
+app.config["JWT_SECRET_KEY"] = "secret"
+
 db = SQLAlchemy(app)
 
 ma = Marshmallow(app)
+bcrypt = Bcrypt(app)
+jwt = JWTManager(app)
 
 # Model - table in our database
 class Product(db.Model):
@@ -52,7 +58,6 @@ class UserSchema(ma.Schema):
 
 users_schema = UserSchema(many=True, exclude=["password"])
 user_schema = UserSchema(many=False, exclude=["password"])
-
 
 
 # cli command
@@ -164,4 +169,19 @@ def delete_product(product_id):
         db.session.commit()
         return {"msg": f"Product {product.name} is deleted"}
     else:
-        return {"error": f"Product {product_id} does not exist"}
+        return {"error": f"Product {product_id} does not exist"}, 404
+    
+
+@app.route("/auth/register", methods = ["POST"])
+def register_user():
+    user_fields = request.get_json()
+    password = user_fields.get("password")
+    hashed_password = bcrypt.generate_password_hash(password).decode('utf8')
+    user = User(
+        name = user_fields.get("name"),
+        email = user_fields.get('email'),
+        password = hashed_password
+    )
+    db.session.add(user)
+    db.session.commit()
+    return user_schema.dump(user), 201
