@@ -27,6 +27,15 @@ class Product(db.Model):
     price = db.Column(db.Float)
     stock = db.Column(db.Integer)
 
+class User(db.Model):
+
+    __tablename__ = "users"
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100))
+    email = db.Column(db.String, nullable = False)
+    password = db.Column(db.String(100), nullable = False)
+    is_admin = db.Column(db.Boolean, default=False)
+
 class ProductSchema(ma.Schema):
     class Meta:
         # fields
@@ -36,6 +45,13 @@ class ProductSchema(ma.Schema):
 products_schema = ProductSchema(many=True)
 # handle sinfle product
 product_schema = ProductSchema(many=False)
+
+class UserSchema(ma.Schema):
+    class Meta:
+        fields = ("id", "name", "email", "password", "is_admin")
+
+users_schema = UserSchema(many=True)
+user_schema = UserSchema(many=False)
 
 
 
