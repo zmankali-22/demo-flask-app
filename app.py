@@ -50,8 +50,8 @@ class UserSchema(ma.Schema):
     class Meta:
         fields = ("id", "name", "email", "password", "is_admin")
 
-users_schema = UserSchema(many=True)
-user_schema = UserSchema(many=False)
+users_schema = UserSchema(many=True, exclude=["password"])
+user_schema = UserSchema(many=False, exclude=["password"])
 
 
 
