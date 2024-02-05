@@ -180,6 +180,7 @@ def update_product(product_id):
 
 
 @app.route("/products/<int:product_id>", methods = ['DELETE'])
+@jwt_required()
 def delete_product(product_id):
     is_admin = authoriseAsAdmin()
     if not is_admin:
