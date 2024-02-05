@@ -114,3 +114,29 @@ def create_product():
     data = product_schema.dump(new_product)
     return data, 201
 
+@app.route("/products/<int:product_id>", methods=["PUT", "PATCH"])
+def update_product(product_id):
+    # find the product from db to update, 
+    stmt = db.select(Product).filter_by(id = product_id)
+    product = db.session.scalar(stmt)
+    #  get the data to be updated - received from the body of the request
+    product_fields =request.get_json()
+    if product:
+    # update the attributes, 
+        product.name = product_fields.get("name") or product.name
+        product.description = product_fields.get("description") or product.description
+        product.price = product_fields.get("price") or product.price
+        product.stock = product_fields.get("stock") or product.stock
+        
+    # commit and the return
+        db.session.commit()
+        return product_schema.dump(product)
+
+    else:
+
+        # return
+        return {"error" : f"Product with id {product_id} doesn't exist"}, 404
+
+
+
+
