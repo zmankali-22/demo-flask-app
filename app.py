@@ -84,9 +84,26 @@ def seed_db():
     product2.stock = 15
 
     # add session
-
     db.session.add(product1)
     db.session.add(product2)
+
+    # users
+    users = [
+        User(
+            name = "User 1",
+            email = "user1@email.com",
+            password= bcrypt.generate_password_hash("123456").decode('utf8'),
+            is_admin = True
+        ),
+        User(
+            name = "User 2",
+            email = "user2@email.com",
+            password= bcrypt.generate_password_hash("123456").decode('utf8'),
+            is_admin = False
+        )
+    ]
+    # add to session
+    db.session.add_all(users)
 
     # commit
     db.session.commit()
